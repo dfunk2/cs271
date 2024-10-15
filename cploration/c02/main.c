@@ -128,22 +128,21 @@ int quartile(char* name) {
 	char *quartile2 = "GHIJKL";
 	char *quartile3 = "MNOPQR";
 	char *quartile4 = "STUVWXYZ";
-	for (int i = 0; name[i] != '\0'; i++) {
-		if (strcmp(name, quartile1)) {
+	char first_char = name[0];
+	if (strchr( quartile1, first_char)) {
 		return 1;
-		}
-		if (strcmp(name, quartile2)) {
+	}
+	else if (strchr(quartile2, first_char)) {
 		return 2;
 		}
-		if (strcmp(name, quartile3)) {
+	else if (strchr(quartile3, first_char)) {
 		return 3;
 		}
-		if (strcmp(name, quartile4)) {
+	else if (strchr(quartile4, first_char)) {
 		return 4;
 		}
-		return 0;
+	return 0;
 	}
-}
 
 
 /* Function: main
