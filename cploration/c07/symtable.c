@@ -5,7 +5,7 @@ struct Symbol* hashArray[SYMBOL_TABLE_SIZE];
 
 int hash(char *str) {
 
-    unsigned int hash = 5381;
+    unsigned long hash = 5381;
     int c; 
 
     while((c = *str++)){
