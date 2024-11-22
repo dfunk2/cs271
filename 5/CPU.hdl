@@ -32,5 +32,64 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	//// Replace this comment with your code.
-}
+	//ALU
+    ALU(x= OutD, y= OutAM, zx= instruction[11], nx= instruction[10], 
+    zy= instruction[9], ny= instruction[8], f= instruction[7], 
+    no= instruction[6], out= outM, out=outALU, zr= zr, ng= ng);
+    
+    //Registers
+    ARegister(in= inA, load= loadA, out= OutA, out[0..14]=addressM);
+    DRegister(in= outALU, load= loadD, out= OutD);
+    PC(in= OutA, load= loadPC, inc= true, reset= reset, out[0..14]= pc);
+
+    //Muxes
+    Mux16(a= outALU, b= instruction, sel= instructionA, out= inA);
+    Mux16(a= OutA, b= inM, sel= AM2ALU, out= OutAM);
+
+    //Decoder
+        //A instruction logic
+        Not(in= instruction[15], out= instructionA);
+        //D register load logic
+        And(a= instruction[15], b= instruction[4], out= loadD);
+
+        //A register load logic
+        And(a= instructionC, b= instruction[5], out= destA);
+        Or(a= instructionA, b= destA, out= loadA);
+
+        //incrementor logic, always true. We want it to incr through program
+        //PC logic
+            //C instruction
+            Not(in= instructionA, out= instructionC);
+            //JGT condition
+                Or(a= zr, b= ng, out= result);
+                Not(in= result, out= pos);
+                And(a= instruction[0], b= pos, out= JGT);
+            //JEQ condtion
+                And(a= instruction[1], b= zr, out= JEQ);
+            //JLT condition
+                And(a= instruction[2], b= ng, out= JLT);
+            //JGE condition
+                Or(a= JGT, b= JEQ, out= JGE);
+            //JNE condition
+                Or(a= JLT, b= JGT, out= JNE);
+            //JLE condition
+                Or(a= JLT, b= JEQ, out= JLE);
+            //JUMP condition
+                Or(a= JGT, b= JLE, out= JMP);
+            //Or and And structor 
+                Or(a= JGT, b= JEQ, out= J1);
+                Or(a= JLT, b= J1, out= J2);
+                Or(a= JGE, b= J2, out= J3);
+                Or(a= JNE, b= J3, out= J4);
+                Or(a= JLE, b= J4, out= J5);
+                Or(a= JMP, b= J5, out= J6);
+                And(a= instructionC, b= J6, out= loadPC);
+
+                //instructionA and AM2ALU logic
+                And(a= instructionC, b= instruction[12], out= AM2ALU);
+                //loadM
+                And(a= instructionC, b= instruction[3], out= loadM, out=writeM);
+            
+
+
+}   
