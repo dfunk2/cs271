@@ -253,19 +253,21 @@ void assemble(const char * file_name, instruction* instructions, int num_instruc
 				if(sym == NULL) {
 					static int next_addr = 16;
 					symtable_insert(instr.instr.a.label, next_addr);
-					//free memory for the label in the instruction...Causes program to output segmentation fault
-					free(instr.instr.a.label);
-					instr.instr.a.label = NULL;
 					next_addr++;
+					//free memory for label
+					free(sym);
+					sym = NULL;
 				} else {
 				op = sym->addr;
 				}
 			}
+			
+			
 			// Print the 16-bit opcode as a binary string and write to file
 			for (int j = 15; j >= 0; j--) {
 				fprintf(fout, "%c", (op & (1 << j)) ? '1' : '0');
 			}
-			fprintf(fout, "\n");
+				fprintf(fout, "\n");
 			
 			}
 			//C instruction
@@ -279,10 +281,9 @@ void assemble(const char * file_name, instruction* instructions, int num_instruc
 			}
 		
 		}
-		
 		fclose(fout);
-		
 }
+
 //instruction to opcode function
 /*--------------------------------------------------------------*/
 opcode instruction_to_opcode(c_instruction instr){
