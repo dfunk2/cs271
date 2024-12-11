@@ -28,7 +28,8 @@ void symtable_insert(char* key, hack_addr addr) {
         i %= SYMBOL_TABLE_SIZE;
     }
     hashArray[i] = item;
-
+    free(item);
+    item = NULL;
 }
 struct Symbol *symtable_find(char * key) {
     unsigned int i = hash(key);

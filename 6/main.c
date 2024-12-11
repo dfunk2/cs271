@@ -32,6 +32,7 @@ int main(int argc, const char *argv[])
 	assemble(argv[1], instructions, num_instructions);
 
 	free(instructions);
+	
 
 	return 0;
 }

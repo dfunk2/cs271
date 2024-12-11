@@ -229,6 +229,7 @@ void parse_C_instruction(char *line, c_instruction *instr) {
 //assembly function
 /*---------------------------------------------------------------------*/
 void assemble(const char * file_name, instruction* instructions, int num_instructions){	
+	add_predefined_symbols();
 	//open output file with .hack suffix
 	char output_file[256];
 	snprintf(output_file, sizeof(output_file), "%s.hack", file_name);
@@ -236,7 +237,7 @@ void assemble(const char * file_name, instruction* instructions, int num_instruc
 	if(fout == NULL) {
 		exit_program(EXIT_CANNOT_OPEN_FILE, file_name);
 	}
-
+	
 	//iterate over instructions
 	for(int i = 0; i < num_instructions; i++) {
 		instruction instr = instructions[i];
@@ -247,22 +248,24 @@ void assemble(const char * file_name, instruction* instructions, int num_instruc
 			if(instr.instr.a.is_addr) {
 				op = instr.instr.a.address;
 			} else { 
+				//predefined symbol
+				sym = symtable_find(instr.instr.a.label);
 				if(sym == NULL) {
-					
 					static int next_addr = 16;
 					symtable_insert(instr.instr.a.label, next_addr);
+					//free memory for the label in the instruction...Causes program to output segmentation fault
+					free(instr.instr.a.label);
+					instr.instr.a.label = NULL;
 					next_addr++;
-				}
+				} else {
 				op = sym->addr;
+				}
 			}
 			// Print the 16-bit opcode as a binary string and write to file
 			for (int j = 15; j >= 0; j--) {
 				fprintf(fout, "%c", (op & (1 << j)) ? '1' : '0');
 			}
-			fprintf(fout, "\n");	
-			//free memory for the label in the instruction
-			free(instr.instr.a.label);
-			instr.instr.a.label = NULL;
+			fprintf(fout, "\n");
 			
 			}
 			//C instruction
@@ -274,8 +277,11 @@ void assemble(const char * file_name, instruction* instructions, int num_instruc
             		}
             		fprintf(fout, "\n");
 			}
+		
 		}
+		
 		fclose(fout);
+		
 }
 //instruction to opcode function
 /*--------------------------------------------------------------*/
