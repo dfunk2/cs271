@@ -184,14 +184,7 @@ bool parse_A_instruction(const char *line, a_instruction *instr) {
 
 //valid label
 	if(s == s_end) { 
-		if (instr->label == NULL) {
-    // Handle allocation failure (return false, exit, or log error)
-    		return false;
-		}
 		instr->label = malloc(strlen(s) +1);
-		if(instr->label == NULL) {
-			return false;
-		}
 		strcpy(instr->label, s);
 		instr->is_addr = false;
 
